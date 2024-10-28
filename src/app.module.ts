@@ -4,6 +4,8 @@ import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UsersModule } from './users/users.module';
 import { ConfigModule } from '@nestjs/config';
+import { AuthModule } from './auth/auth.module';
+import { SessionsModule } from './sessions/sessions.module';
 
 @Module({
   imports: [
@@ -12,6 +14,8 @@ import { ConfigModule } from '@nestjs/config';
       `mongodb+srv://aozyrskyii:${process.env.MONGODB_PASSWORD}@nestjs.qm5sn.mongodb.net/nestjs?retryWrites=true&w=majority`,
     ),
     UsersModule,
+    AuthModule,
+    SessionsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

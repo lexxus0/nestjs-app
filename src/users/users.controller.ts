@@ -4,7 +4,6 @@ import {
   Post,
   Body,
   Param,
-  Put,
   Delete,
   Patch,
   UseFilters,
@@ -13,6 +12,9 @@ import {
 import { UsersService } from './users.service';
 import { User } from './user.schema';
 import { HttpExceptionFilter } from 'src/http-exception.filter';
+import { ValidateObjectIdPipe } from 'src/pipes/validate-object-id.pipe';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('users')
 @UseFilters(HttpExceptionFilter)
@@ -26,23 +28,30 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
-  @Get(':id') // validate id
-  async findOne(@Param('id') id: string): Promise<User> {
-    return this.usersService.findOne(id);
+  @Get(':id')
+  async findOne(@Param('id', ValidateObjectIdPipe) id: string): Promise<User> {
+    const user = await this.usersService.findOne(id);
+    if (user === null) throw new HttpException('User not found', 404);
+    return user;
   }
 
   @Post()
-  async create(@Body() user: User): Promise<User> {
-    return this.usersService.create(user);
+  async create(@Body() createUserDto: CreateUserDto) {
+    return this.usersService.create(createUserDto);
   }
 
   @Patch(':id')
-  async update(@Param(':id') id: string, @Body() user: User): Promise<User> {
-    return this.usersService.update(id, user);
+  async update(
+    @Param('id', ValidateObjectIdPipe) id: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    const user = await this.usersService.update(id, updateUserDto);
+    if (user === null) throw new HttpException('User not found', 404);
+    return user;
   }
 
   @Delete(':id')
-  async delete(@Param(':id') id: string): Promise<any> {
+  async delete(@Param('id', ValidateObjectIdPipe) id: string): Promise<any> {
     return this.usersService.delete(id);
   }
 }
